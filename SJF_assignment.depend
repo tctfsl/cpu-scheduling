@@ -1,0 +1,13 @@
+# depslib dependency file v1.0
+1504800190 source:c:\users\lee khai chuen\desktop\os-sjf2\sjf_assignment\process.cpp
+	"Process.hpp"
+
+1504800107 c:\users\lee khai chuen\desktop\os-sjf2\sjf_assignment\process.hpp
+
+1506535742 source:c:\users\lee khai chuen\desktop\os-sjf2\sjf_assignment\main.cpp
+	<algorithm>
+	<iomanip>
+	<iostream>
+	<vector>
+	"Process.hpp"
+
