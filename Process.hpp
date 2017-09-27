@@ -1,5 +1,6 @@
-#ifndef PROCESS_HPP
-#define PROCESS_HPP
+#ifndef PROCESS_H_INCLUDED
+#define PROCESS_H_INCLUDED
+
 
 class Process
 {
@@ -24,4 +25,7 @@ class Process
     void calculateWaitTime(int burstTime);
 };
 
-#endif
+
+
+
+#endif // PROCESS_H_INCLUDED
