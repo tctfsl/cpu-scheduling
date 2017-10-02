@@ -277,11 +277,11 @@ void RoundRobin(vector<Process> pList) {
 void FCFS_PREMP(vector<Process> pList)
 {
     //Vector to keep track of which process are running at each increment.
-    vector<int>int_process;
+    vector<int>completedProcesses;
     //Store all processes.
-    vector<Process> tem_p;
+    vector<Process> processVector;
     int basePriority = 1;
-    int sum_burstime = 0;
+    int totalBurstTime = 0;
     int pro_cess = pList[0].getArriveTime();
 
     //Bubble Sort based on priority based on ascending order.
@@ -291,72 +291,72 @@ void FCFS_PREMP(vector<Process> pList)
         {
             if(pList[j].getPriority()>pList[j+1].getPriority())
             {
-                Process temp_p = pList[j+1];
+                Process tempProcess = pList[j+1];
                 pList[j+1] = pList[j];
-                pList[j] = temp_p;
+                pList[j] = tempProcess;
             }
         }
     }
 
     for(int i = 0; i < pro_cess; i++)
     {
-        int_process.push_back(-1);
+        completedProcesses.push_back(-1);
     }
     //Calculate total burst time.
     for(int x =0; x< pList.size(); x++)
     {
-        sum_burstime = sum_burstime + pList[x].getBurstTime();
+        totalBurstTime = totalBurstTime + pList[x].getBurstTime();
     }
 
 
-    for(int tick = 0; tick < sum_burstime; tick++)
+    for(int tick = 0; tick < totalBurstTime; tick++)
     {
         for(int i = 0; i < pList.size(); i++)
         {
             if (pList[i].getArriveTime() == tick)
             {
-                tem_p.push_back(pList[i]);
+                processVector.push_back(pList[i]);
                 //If 1'st tick, set base priority, and resort vector with bubble sort.
                 if (i == 1)
                 {
                     basePriority = pList[0].getPriority();
-                    for(int j = 0; j < tem_p.size()-1 ; j++)
+                    for(int j = 0; j < processVector.size()-1 ; j++)
                     {
-                        if(tem_p[j].getPriority() > tem_p[j+1].getPriority())
+                        if(processVector[j].getPriority() > processVector[j+1].getPriority())
                         {
-                            Process temp_p = tem_p[j];
-                            tem_p[j] = tem_p[j+1];
-                            tem_p[j+1] = temp_p;
+                            Process tempProcess = processVector[j];
+                            processVector[j] = processVector[j+1];
+                            processVector[j+1] = tempProcess;
                         }
 
-                        if(tem_p[j].getPriority() == tem_p[j+1].getPriority())
+                        if(processVector[j].getPriority() == processVector[j+1].getPriority())
                         {
-                            if(tem_p[j].getPriority() > tem_p[j+1].getPriority())
+                            if(processVector[j].getPriority() > processVector[j+1].getPriority())
                             {
-                                Process temp_p = tem_p[j+1];
-                                tem_p[j+1] = tem_p[j];
-                                tem_p[j] = temp_p;
+                                Process tempProcess = processVector[j+1];
+                                processVector[j+1] = processVector[j];
+                                processVector[j] = tempProcess;
                             }
                         }
                     }
                 }
                 //Bubble sort vector based on priority in ascending order.
-                for(int j = 0; j < tem_p.size()-1 ; j++)
+                for(int j = 0; j < processVector.size()-1 ; j++)
                 {
-                    if(tem_p[j].getPriority() > tem_p[j+1].getPriority())
+                    if(processVector[j].getPriority() > processVector[j+1].getPriority())
                     {
-                        Process temp_p = tem_p[j];
-                        tem_p[j] = tem_p[j+1];
-                        tem_p[j+1] = temp_p;
+                        Process tempProcess = processVector[j];
+                        processVector[j] = processVector[j+1];
+                        processVector[j+1] = tempProcess;
                     }
 
-                    if(tem_p[j].getPriority() == tem_p[j+1].getPriority())
+                    if(processVector[j].getPriority() == processVector[j+1].getPriority())
                         {
-                            if(tem_p[j].getPriority() > tem_p[j+1].getPriority())
+                            if(processVector[j].getPriority() > processVector[j+1].getPriority())
                             {
-                                Process temp_p = tem_p[j+1];
-                                tem_p[j+1] = tem_p[j];
-                                tem_p[j] = temp_p;
+                                Process tempProcess = processVector[j+1];
+                                processVector[j+1] = processVector[j];
+                                processVector[j] = tempProcess;
                             }
                         }
                 }
@@ -366,22 +366,22 @@ void FCFS_PREMP(vector<Process> pList)
                 {
                     basePriority = pList[i].getPriority();
 
-                    for(int j = 0; j < tem_p.size()-1 ; j++)
+                    for(int j = 0; j < processVector.size()-1 ; j++)
                     {
-                        if(tem_p[j].getPriority() > tem_p[j+1].getPriority())
+                        if(processVector[j].getPriority() > processVector[j+1].getPriority())
                         {
-                            Process temp_p = tem_p[j];
-                            tem_p[j] = tem_p[j+1];
-                            tem_p[j+1] = temp_p;
+                            Process tempProcess = processVector[j];
+                            processVector[j] = processVector[j+1];
+                            processVector[j+1] = tempProcess;
                         }
 
-                        if(tem_p[j].getPriority() == tem_p[j+1].getPriority())
+                        if(processVector[j].getPriority() == processVector[j+1].getPriority())
                         {
-                            if(tem_p[j].getPriority() > tem_p[j+1].getPriority())
+                            if(processVector[j].getPriority() > processVector[j+1].getPriority())
                             {
-                                Process temp_p = tem_p[j+1];
-                                tem_p[j+1] = tem_p[j];
-                                tem_p[j] = temp_p;
+                                Process tempProcess = processVector[j+1];
+                                processVector[j+1] = processVector[j];
+                                processVector[j] = tempProcess;
                             }
                         }
                     }
@@ -390,24 +390,24 @@ void FCFS_PREMP(vector<Process> pList)
         }
 
         //Push current working process into vector
-        int_process.push_back(tem_p[0].getPID());
-        tem_p[0].decrementBurstTime();
+        completedProcesses.push_back(processVector[0].getPID());
+        processVector[0].decrementBurstTime();
 
 
         //If a process is finished. Calculate its turnaround time, wait time, and remove it from list of processes.
-        if(tem_p[0].getBurstTime() == 0)
+        if(processVector[0].getBurstTime() == 0)
         {
             for(int counter = 0; counter <= pList.size(); counter++)
             {
-                if(tem_p[0].getPID() == pList[counter].getPID())
+                if(processVector[0].getPID() == pList[counter].getPID())
                 {
                     pList[counter].calculateTurnaroundTime((tick+1));
                     pList[counter].calculateWaitTime(pList[counter].getBurstTime());
                 }
             }
-            tem_p.erase(tem_p.begin());
+            processVector.erase(processVector.begin());
         }
 
     }
-    ganttChart(int_process);
+    ganttChart(completedProcesses);
 }
