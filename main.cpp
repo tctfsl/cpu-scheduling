@@ -276,7 +276,7 @@ void RoundRobin(vector<Process> pList) {
 
 void FCFS_PREMP(vector<Process> pList)
 {
-    //Vector to keep track of which process are running at each increment.
+    //Vector to keep track of process worked on at every tick
     vector<int>completedProcesses;
     //Store all processes.
     vector<Process> processVector;
@@ -307,7 +307,6 @@ void FCFS_PREMP(vector<Process> pList)
     {
         totalBurstTime = totalBurstTime + pList[x].getBurstTime();
     }
-
 
     for(int tick = 0; tick < totalBurstTime; tick++)
     {
@@ -351,14 +350,14 @@ void FCFS_PREMP(vector<Process> pList)
                     }
 
                     if(processVector[j].getPriority() == processVector[j+1].getPriority())
+                    {
+                        if(processVector[j].getPriority() > processVector[j+1].getPriority())
                         {
-                            if(processVector[j].getPriority() > processVector[j+1].getPriority())
-                            {
-                                Process tempProcess = processVector[j+1];
-                                processVector[j+1] = processVector[j];
-                                processVector[j] = tempProcess;
-                            }
+                            Process tempProcess = processVector[j+1];
+                            processVector[j+1] = processVector[j];
+                            processVector[j] = tempProcess;
                         }
+                    }
                 }
 
                 //If current process has a higher priority than base priority, and then bubble sort vector.
