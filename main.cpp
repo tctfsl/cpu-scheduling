@@ -9,12 +9,16 @@ using namespace std;
 void ganttChart(vector<int> ganttTimer);
 void setProcess(vector<Process> &pList);
 void RoundRobin(vector<Process> pList, int timeQuantum, double &avgTTRR, double &avgWTRR, vector<int> &ganttTimerRR);
+void ThreeLevel(vector<Process> pList, int timeQuantum, double &avgTTTL, double &avgWTTL, vector<int> &ganttTimerTL);
 
 int main() {
   double avgTTRR = 0;
   double avgWTRR = 0;
+  double avgTTTL = 0;
+  double avgWTTL = 0;
   int timeQuantum;
   vector<int> ganttTimerRR;
+  vector<int> ganttTimerTL;
   vector<Process> pList;
   
   cout << "Enter a time quantum: ";
@@ -22,13 +26,22 @@ int main() {
   
   setProcess(pList);
   RoundRobin(pList, timeQuantum, avgTTRR, avgWTRR, ganttTimerRR);
+  ThreeLevel(pList, timeQuantum, avgTTTL, avgWTTL, ganttTimerTL);
   
   cout << "Round Robin: " << endl;
   ganttChart(ganttTimerRR);
   
+  cout << endl << "Three Level Scheduling: " << endl;
+  ganttChart(ganttTimerTL);
+  
   cout << "Round Robin:" << endl
 	   << "Average Turnaround Time: " << avgTTRR << endl
-	   << "Average Wait Time: " << avgWTRR << endl;
+	   << "Average Wait Time: " << avgWTRR << endl << endl;
+	
+  cout << "Three Level Scheduling:" << endl
+	   << "Average Turnaround Time: " << avgTTTL << endl
+	   << "Average Wait Time: " << avgWTTL << endl;
+  
 }
 
 void ganttChart(vector<int> ganttTimer) {
@@ -300,4 +313,160 @@ void RoundRobin(vector<Process> pList, int timeQuantum, double &avgTTRR, double 
   
   avgTTRR /= pList.size();
   avgWTRR /= pList.size();
+}
+
+void ThreeLevel(vector <Process> pList, int timeQuantum, double &avgTTTL, double &avgWTTL, vector<int> &ganttTimerTL) {
+  vector <Process> queue1;
+  vector <Process> queue2;
+  vector <Process> queue3;
+  vector<int> int_process;
+  int quantumTime;
+  int sum_burstime = pList[0].getArriveTime();
+  
+  for (int i = pList.size() - 1; i > 0; i--) {
+    for (int j = 0; j < i; j++) {
+      if (pList[j].getArriveTime() > pList[j + 1].getArriveTime()) {
+        Process temp_p = pList[j + 1];
+        pList[j + 1] = pList[j];
+        pList[j] = temp_p;
+      }
+    }
+  }
+  
+  for (int x = 0; x < pList.size(); x++) {
+    sum_burstime = sum_burstime + pList[x].getBurstTime();
+  }
+  
+  for (int i = pList[0].getArriveTime(); i < sum_burstime; i++) {
+    for (int y = 0; y < pList.size(); y++) {
+      if ((pList[y].getArriveTime() == i) && ((pList[y].getPriority() == 1) || (pList[y].getPriority() == 2))) {
+        cout << "Time: " << i << endl;
+        cout << "P" << pList[y].getPID() << " Push to Queue One \n";
+        queue1.push_back(pList[y]);
+        cout << "Queue 1 Size is: " << queue1.size() << endl;
+        
+        for (int i = queue1.size(); i > 0; i--) {
+          if (queue1.size() > 1) {
+            for (int j = 0; j < i; j++) {
+              if (queue1[j].getPriority() > queue1[j + 1].getPriority()) {
+                Process temp_p = queue1[j + 1];
+                queue1[j + 1] = queue1[j];
+                queue1[j] = temp_p;
+              }
+              
+              if (queue1[j].getPriority() == queue1[j + 1].getPriority()) {
+                if (queue1[j].getArriveTime() > queue1[j + 1].getArriveTime()) {
+                  Process temp_p = queue1[j + 1];
+                  queue1[j + 1] = queue1[j];
+                  queue1[j] = temp_p;
+                }
+              }
+            }
+          }
+        }
+        cout << "P" << pList[y].getPID() << "\n";
+        quantumTime = queue1[0].getBurstTime();
+        cout << "quantumTime: " << quantumTime << "\n";
+        
+      }
+      
+      if ((pList[y].getArriveTime() == i) && ((pList[y].getPriority() == 3) || (pList[y].getPriority() == 4))) {
+        
+        cout << "Time: " << i << endl;
+        cout << "P" << pList[y].getPID() << " Push to Queue Two \n";
+        queue2.push_back(pList[y]);
+        cout << "Queue 2 Size is: " << queue2.size() << endl;
+        for (int i = queue2.size(); i > 0; i--) {
+          
+          if (queue2.size() > 1) {
+            for (int j = 0; j < i; j++) {
+              if (queue2[j].getPriority() > queue2[j + 1].getPriority()) {
+                Process temp_p = queue2[j + 1];
+                queue2[j + 1] = queue2[j];
+                queue2[j] = temp_p;
+              }
+              
+              if (queue2[j].getPriority() == queue2[j + 1].getPriority()) {
+                if (queue2[j].getArriveTime() > queue2[j + 1].getArriveTime()) {
+                  Process temp_p = queue2[j + 1];
+                  queue2[j + 1] = queue2[j];
+                  queue2[j] = temp_p;
+                }
+              }
+            }
+          }
+        }
+        cout << "P" << pList[y].getPID() << "\n";
+      }
+      
+      if ((pList[y].getArriveTime() == i) && ((pList[y].getPriority() == 5) || (pList[y].getPriority() == 6))) {
+        
+        cout << "Time: " << i << endl;
+        cout << "P" << pList[y].getPID() << " Push to Queue Three \n";
+        queue3.push_back(pList[y]);
+        cout << "Queue 3 Size is: " << queue3.size() << endl;
+        for (int i = queue3.size(); i > 0; i--) {
+          
+          if (queue3.size() > 1) {
+            for (int j = 0; j < i; j++) {
+              if (queue3[j].getPriority() > queue3[j + 1].getPriority()) {
+                Process temp_p = queue3[j + 1];
+                queue3[j + 1] = queue3[j];
+                queue3[j] = temp_p;
+              }
+              
+              if (queue3[j].getPriority() == queue3[j + 1].getPriority()) {
+                if (queue3[j].getArriveTime() > queue3[j + 1].getArriveTime()) {
+                  Process temp_p = queue3[j + 1];
+                  queue3[j + 1] = queue3[j];
+                  queue3[j] = temp_p;
+                }
+              }
+            }
+          }
+        }
+        
+      }
+    }
+    
+    if (queue1.size() == 0 && queue2.size() == 0 && queue3.size() == 0) {
+      int_process.push_back(-1);
+    }
+    
+    if (queue1.size() != 0) {
+      int_process.push_back(queue1[0].getPID());
+      queue1[0].decrementBurstTime();
+      if (queue1[0].getBurstTime() == (quantumTime - 3)) {
+        Process temp_queue = queue1[0];
+        queue1.erase(queue1.begin());
+        queue1.push_back(temp_queue);
+        quantumTime = queue1[0].getBurstTime();
+        
+      }
+      if (queue1[0].getBurstTime() == 0) {
+        queue1.erase(queue1.begin());
+      }
+    }
+    
+    if (queue1.size() == 0 && queue2.size() != 0) {
+      int_process.push_back(queue2[0].getPID());
+      
+      queue2[0].decrementBurstTime();
+      if (queue2[0].getBurstTime() == 0) {
+        queue2.erase(queue2.begin());
+      }
+    }
+    
+    if (queue1.size() == 0 && queue2.size() == 0 && queue3.size() != 0) {
+      int_process.push_back(queue3[0].getPID());
+      
+      queue3[0].decrementBurstTime();
+      if (queue3[0].getBurstTime() == 0) {
+        queue3.erase(queue3.begin());
+      }
+    }
+  }
+  
+  int_process.pop_back();
+  ganttTimerTL = int_process;
 }
