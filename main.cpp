@@ -4,43 +4,56 @@
 #include <string>
 #include <vector>
 #include "Process.hpp"
+
 using namespace std;
 
 void ganttChart(vector<int> ganttTimer);
 void setProcess(vector<Process> &pList);
 void RoundRobin(vector<Process> pList, int timeQuantum, double &avgTTRR, double &avgWTRR, vector<int> &ganttTimerRR);
-void FCFS_PREMP(vector<Process> pList, double &avgTTRR, double &avgWTRR, vector<int> &ganttTimerRR);
+void ThreeLevel(vector<Process> pList, int timeQuantum, double &avgTTTL, double &avgWTTL, vector<int> &ganttTimerTL);
+void SJF(vector<Process> pList, double &avgTTSJF, double &avgWTSJF, vector<int> &ganttTimerSJF);
 
 int main() {
-    double avgTTRR = 0;
-    double avgWTRR = 0;
-    double avgTTFCFS = 0;
-    double avgWTFCFS = 0;
-    int timeQuantum;
-    vector<int> ganttTimerRR;
-    vector<int> ganttTimerFCFS;
-    vector<Process> pList;
+  double avgTTRR = 0;
+  double avgWTRR = 0;
+  double avgTTTL = 0;
+  double avgWTTL = 0;
+  double avgTTSJF = 0;
+  double avgWTSJF = 0;
+  int timeQuantum;
+  vector<int> ganttTimerRR;
+  vector<int> ganttTimerTL;
+  vector<int> ganttTimerSJF;
+  vector<Process> pList;
 
-    cout << "Enter a time quantum: ";
-    cin >> timeQuantum;
+  cout << "Enter a time quantum: ";
+  cin >> timeQuantum;
 
-    setProcess(pList);
-    RoundRobin(pList, timeQuantum, avgTTRR, avgWTRR, ganttTimerRR);
-    FCFS_PREMP(pList, avgTTFCFS, avgWTFCFS, ganttTimerFCFS);
+  setProcess(pList);
+  RoundRobin(pList, timeQuantum, avgTTRR, avgWTRR, ganttTimerRR);
+  ThreeLevel(pList, timeQuantum, avgTTTL, avgWTTL, ganttTimerTL);
+  SJF(pList, avgTTSJF, avgWTSJF, ganttTimerSJF);
 
-    cout << "Round Robin: " << endl;
-    ganttChart(ganttTimerRR);
+  cout << "Round Robin: " << endl;
+  ganttChart(ganttTimerRR);
 
-    cout << "Round Robin:" << endl
+  cout << endl << "Three Level Scheduling: " << endl;
+  ganttChart(ganttTimerTL);
+
+  cout << endl << "SJF: " << endl;
+  ganttChart(ganttTimerSJF);
+
+  cout << "Round Robin:" << endl
        << "Average Turnaround Time: " << avgTTRR << endl
-       << "Average Wait Time: " << avgWTRR << endl;
+       << "Average Wait Time: " << avgWTRR << endl << endl;
 
-    cout << "FCFS Preemptive Priority: " << endl;
-    ganttChart(ganttTimerFCFS);
+  cout << "Three Level Scheduling:" << endl
+       << "Average Turnaround Time: " << avgTTTL << endl
+       << "Average Wait Time: " << avgWTTL << endl;
 
-    cout << "FCFS Preemptive Priority:" << endl
-       << "Average Turnaround Time: " << avgTTFCFS << endl
-       << "Average Wait Time: " << avgWTFCFS << endl;
+  cout << "Short Job First:" << endl
+       << "Average Turnaround Time: " << avgTTSJF << endl
+       << "Average Wait Time: " << avgWTSJF << endl;
 }
 
 void ganttChart(vector<int> ganttTimer) {
@@ -177,7 +190,7 @@ void RoundRobin(vector<Process> pList, int timeQuantum, double &avgTTRR, double 
   vector<int> ganttTimer;
   vector<Process> queue;
 
-  for(int i = 0; i < pList.size(); i++) {
+  for (int i = 0; i < pList.size(); i++) {
     totalBurstTime += pList[i].getBurstTime();
   }
 
@@ -188,7 +201,7 @@ void RoundRobin(vector<Process> pList, int timeQuantum, double &avgTTRR, double 
 
     //If have completed a cycle.
     if (!hasSkipped) {
-      for(int i = 0; i < pList.size(); i++) {
+      for (int i = 0; i < pList.size(); i++) {
         if (pList[i].getArriveTime() == runTime) {
           Process tempProcess;
           tempProcess = pList[i];
@@ -197,8 +210,8 @@ void RoundRobin(vector<Process> pList, int timeQuantum, double &avgTTRR, double 
       }
 
       if (tempQueue.size() > 1) {
-        for(int i = 0; i < (tempQueue.size() - 1); i++) {
-          for(int j = 0; j < ((tempQueue.size() - i) - 1); j++) {
+        for (int i = 0; i < (tempQueue.size() - 1); i++) {
+          for (int j = 0; j < ((tempQueue.size() - i) - 1); j++) {
             if (tempQueue[j].getPriority() > tempQueue[j + 1].getPriority()) {
               Process swappableProcess = tempQueue[j];
               tempQueue[j] = tempQueue[j + 1];
@@ -211,17 +224,17 @@ void RoundRobin(vector<Process> pList, int timeQuantum, double &avgTTRR, double 
       //If queue is empty, or
       //there is at least a process ready to be executed.
       if (queue.empty()) {
-        for(int i = 0; i < tempQueue.size(); i++) {
+        for (int i = 0; i < tempQueue.size(); i++) {
           queue.push_back(tempQueue[i]);
         }
       }
       else {
-        for(int i = 0; i < tempQueue.size(); i++) {
+        for (int i = 0; i < tempQueue.size(); i++) {
           int addingMode = -1;
           int checkedPriority = tempQueue[i].getPriority();
           int designatedIndex = (queue.size() - 1);
 
-          for(int j = (queue.size() - 1); j > -1; j--) {
+          for (int j = (queue.size() - 1); j > -1; j--) {
             bool isLowerPriority = (checkedPriority >= queue[j].getPriority());
 
             if (isLowerPriority) {
@@ -268,11 +281,11 @@ void RoundRobin(vector<Process> pList, int timeQuantum, double &avgTTRR, double 
         }
         else {
           if (executingProcess.getPID() != -1) {
-		    executingProcess.calculateTurnaroundTime(runTime);
-			executingProcess.calculateWaitTime(pList[executingProcess.getPID() - 1].getBurstTime());
-			avgTTRR += executingProcess.getTurnaroundTime();
-			avgWTRR += executingProcess.getWaitTime();
-		  }
+            executingProcess.calculateTurnaroundTime(runTime);
+            executingProcess.calculateWaitTime(pList[executingProcess.getPID() - 1].getBurstTime());
+            avgTTRR += executingProcess.getTurnaroundTime();
+            avgWTRR += executingProcess.getWaitTime();
+          }
 
           executingProcess = queue.at(0);
           queue.erase(queue.begin());
@@ -289,9 +302,9 @@ void RoundRobin(vector<Process> pList, int timeQuantum, double &avgTTRR, double 
         }
         else {
           executingProcess.calculateTurnaroundTime(runTime);
-		  executingProcess.calculateWaitTime(pList[executingProcess.getPID() - 1].getBurstTime());
-		  avgTTRR += executingProcess.getTurnaroundTime();
-		  avgWTRR += executingProcess.getWaitTime();
+          executingProcess.calculateWaitTime(pList[executingProcess.getPID() - 1].getBurstTime());
+          avgTTRR += executingProcess.getTurnaroundTime();
+          avgWTRR += executingProcess.getWaitTime();
         }
 
         executingProcess = queue.at(0);
@@ -314,141 +327,248 @@ void RoundRobin(vector<Process> pList, int timeQuantum, double &avgTTRR, double 
   avgWTRR /= pList.size();
 }
 
-void FCFS_PREMP(vector<Process> pList, double &avgTTFCFS, double &avgWTFCFS, vector<int> &ganttTimerFCFS)
-{
-    //Vector to keep track of process worked on at every tick
-    //Store all processes.
-    vector<Process> processVector;
-//    double turnaroundTime = 0;
-//    double waitTime = 0;
-    int basePriority = 1;
-    int totalBurstTime = 0;
-    int pro_cess = pList[0].getArriveTime();
+void ThreeLevel(vector<Process> pList, int timeQuantum, double &avgTTTL, double &avgWTTL, vector<int> &ganttTimerTL) {
+  vector<Process> queue1;
+  vector<Process> queue2;
+  vector<Process> queue3;
+  vector<int> int_process;
+  int quantumTime;
+  int sum_burstime = pList[0].getArriveTime();
 
-    //Bubble Sort based on priority based on ascending order.
-    for(int i = pList.size()-1; i>0; i--)
-    {
-        for(int j =0; j<i; j++)
-        {
-            if(pList[j].getPriority()>pList[j+1].getPriority())
-            {
-                Process tempProcess = pList[j+1];
-                pList[j+1] = pList[j];
-                pList[j] = tempProcess;
+  for (int i = pList.size() - 1; i > 0; i--) {
+    for (int j = 0; j < i; j++) {
+      if (pList[j].getArriveTime() > pList[j + 1].getArriveTime()) {
+        Process temp_p = pList[j + 1];
+        pList[j + 1] = pList[j];
+        pList[j] = temp_p;
+      }
+    }
+  }
+
+  for (int x = 0; x < pList.size(); x++) {
+    sum_burstime = sum_burstime + pList[x].getBurstTime();
+  }
+
+  for (int i = pList[0].getArriveTime(); i < sum_burstime; i++) {
+    for (int y = 0; y < pList.size(); y++) {
+      if ((pList[y].getArriveTime() == i) && ((pList[y].getPriority() == 1) || (pList[y].getPriority() == 2))) {
+        queue1.push_back(pList[y]);
+        for (int i = queue1.size(); i > 0; i--) {
+          if (queue1.size() > 1) {
+            for (int j = 0; j < i; j++) {
+              if (queue1[j].getPriority() > queue1[j + 1].getPriority()) {
+                Process temp_p = queue1[j + 1];
+                queue1[j + 1] = queue1[j];
+                queue1[j] = temp_p;
+              }
+
+              if (queue1[j].getPriority() == queue1[j + 1].getPriority()) {
+                if (queue1[j].getArriveTime() > queue1[j + 1].getArriveTime()) {
+                  Process temp_p = queue1[j + 1];
+                  queue1[j + 1] = queue1[j];
+                  queue1[j] = temp_p;
+                }
+              }
             }
+          }
         }
-    }
+        quantumTime = queue1[0].getBurstTime();
+      }
 
-    for(int i = 0; i < pro_cess; i++)
-    {
-        ganttTimerFCFS.push_back(-1);
-    }
-    //Calculate total burst time.
-    for(int x =0; x < pList.size(); x++)
-    {
-        totalBurstTime = totalBurstTime + pList[x].getBurstTime();
-    }
+      if ((pList[y].getArriveTime() == i) && ((pList[y].getPriority() == 3) || (pList[y].getPriority() == 4))) {
 
-    for(int tick = 0; tick < totalBurstTime; tick++)
-    {
-        for(int i = 0; i < pList.size(); i++)
-        {
-            if (pList[i].getArriveTime() == tick)
-            {
-                processVector.push_back(pList[i]);
-                //If 1'st tick, set base priority, and resort vector with bubble sort.
-                if (i == 1)
-                {
-                    basePriority = pList[0].getPriority();
-                    for(int j = 0; j < processVector.size()-1 ; j++)
-                    {
-                        if(processVector[j].getPriority() > processVector[j+1].getPriority())
-                        {
-                            Process tempProcess = processVector[j];
-                            processVector[j] = processVector[j+1];
-                            processVector[j+1] = tempProcess;
-                        }
+        cout << "Time: " << i << endl;
+        cout << "P" << pList[y].getPID() << " Push to Queue Two \n";
+        queue2.push_back(pList[y]);
+        cout << "Queue 2 Size is: " << queue2.size() << endl;
+        for (int i = queue2.size(); i > 0; i--) {
 
-                        if(processVector[j].getPriority() == processVector[j+1].getPriority())
-                        {
-                            if(processVector[j].getPriority() > processVector[j+1].getPriority())
-                            {
-                                Process tempProcess = processVector[j+1];
-                                processVector[j+1] = processVector[j];
-                                processVector[j] = tempProcess;
-                            }
-                        }
-                    }
+          if (queue2.size() > 1) {
+            for (int j = 0; j < i; j++) {
+              if (queue2[j].getPriority() > queue2[j + 1].getPriority()) {
+                Process temp_p = queue2[j + 1];
+                queue2[j + 1] = queue2[j];
+                queue2[j] = temp_p;
+              }
+
+              if (queue2[j].getPriority() == queue2[j + 1].getPriority()) {
+                if (queue2[j].getArriveTime() > queue2[j + 1].getArriveTime()) {
+                  Process temp_p = queue2[j + 1];
+                  queue2[j + 1] = queue2[j];
+                  queue2[j] = temp_p;
                 }
-                //Bubble sort vector based on priority in ascending order.
-                for(int j = 0; j < processVector.size()-1 ; j++)
-                {
-                    if(processVector[j].getPriority() > processVector[j+1].getPriority())
-                    {
-                        Process tempProcess = processVector[j];
-                        processVector[j] = processVector[j+1];
-                        processVector[j+1] = tempProcess;
-                    }
-
-                    if(processVector[j].getPriority() == processVector[j+1].getPriority())
-                    {
-                        if(processVector[j].getPriority() > processVector[j+1].getPriority())
-                        {
-                            Process tempProcess = processVector[j+1];
-                            processVector[j+1] = processVector[j];
-                            processVector[j] = tempProcess;
-                        }
-                    }
-                }
-
-                //If current process has a higher priority than base priority, and then bubble sort vector.
-                if (pList[i].getPriority() <= basePriority)
-                {
-                    basePriority = pList[i].getPriority();
-
-                    for(int j = 0; j < processVector.size()-1 ; j++)
-                    {
-                        if(processVector[j].getPriority() > processVector[j+1].getPriority())
-                        {
-                            Process tempProcess = processVector[j];
-                            processVector[j] = processVector[j+1];
-                            processVector[j+1] = tempProcess;
-                        }
-
-                        if(processVector[j].getPriority() == processVector[j+1].getPriority())
-                        {
-                            if(processVector[j].getPriority() > processVector[j+1].getPriority())
-                            {
-                                Process tempProcess = processVector[j+1];
-                                processVector[j+1] = processVector[j];
-                                processVector[j] = tempProcess;
-                            }
-                        }
-                    }
-                }
+              }
             }
+          }
+        }
+        cout << "P" << pList[y].getPID() << "\n";
+      }
+
+      if ((pList[y].getArriveTime() == i) && ((pList[y].getPriority() == 5) || (pList[y].getPriority() == 6))) {
+        queue3.push_back(pList[y]);
+
+        for (int i = queue3.size(); i > 0; i--) {
+
+          if (queue3.size() > 1) {
+            for (int j = 0; j < i; j++) {
+              if (queue3[j].getPriority() > queue3[j + 1].getPriority()) {
+                Process temp_p = queue3[j + 1];
+                queue3[j + 1] = queue3[j];
+                queue3[j] = temp_p;
+              }
+
+              if (queue3[j].getPriority() == queue3[j + 1].getPriority()) {
+                if (queue3[j].getArriveTime() > queue3[j + 1].getArriveTime()) {
+                  Process temp_p = queue3[j + 1];
+                  queue3[j + 1] = queue3[j];
+                  queue3[j] = temp_p;
+                }
+              }
+            }
+          }
         }
 
-        //Push current working process into vector
-        ganttTimerFCFS.push_back(processVector[0].getPID());
-        processVector[0].decrementBurstTime();
-
-        //If a process is finished. Calculate its turnaround time, wait time, and remove it from list of processes.
-        if(processVector[0].getBurstTime() == 0)
-        {
-            for(int counter = 0; counter <= pList.size(); counter++)
-            {
-                if(processVector[0].getPID() == pList[counter].getPID())
-                {
-                    pList[counter].calculateTurnaroundTime((tick+1));
-                    avgTTFCFS += pList[counter].getTurnaroundTime();
-                    pList[counter].calculateWaitTime(pList[counter].getBurstTime());
-                    avgWTFCFS += pList[counter].getWaitTime();
-                }
-            }
-            processVector.erase(processVector.begin());
-        }
+      }
     }
-    avgTTFCFS /= pList.size();
-    avgWTFCFS /= pList.size();
+
+    if (queue1.size() == 0 && queue2.size() == 0 && queue3.size() == 0) {
+      int_process.push_back(-1);
+    }
+
+    if (queue1.size() != 0) {
+      int_process.push_back((queue1.front()).getPID());
+      queue1[0].decrementBurstTime();
+      if (queue1[0].getBurstTime() == (quantumTime - timeQuantum)) {
+        Process temp_queue = queue1[0];
+        queue1.erase(queue1.begin());
+        queue1.push_back(temp_queue);
+        quantumTime = queue1[0].getBurstTime();
+
+      }
+      if (queue1[0].getBurstTime() == 0) {
+        for (int counter = 0; counter <= pList.size(); counter++) {
+        if (queue1[0].getPID() == pList[counter].getPID()) {
+          pList[counter].calculateTurnaroundTime((i + 1));
+          avgTTTL += pList[counter].getTurnaroundTime();
+          pList[counter].calculateWaitTime(pList[counter].getBurstTime());
+          avgWTTL += pList[counter].getWaitTime();
+        }
+      }
+
+        queue1.erase(queue1.begin());
+      }
+    }
+
+    if (queue1.size() == 0 && queue2.size() != 0) {
+      int_process.push_back(queue2[0].getPID());
+
+      queue2[0].decrementBurstTime();
+      if (queue2[0].getBurstTime() == 0) {
+        for (int counter = 0; counter <= pList.size(); counter++) {
+        if (queue1[0].getPID() == pList[counter].getPID()) {
+          pList[counter].calculateTurnaroundTime((i + 1));
+          avgTTTL += pList[counter].getTurnaroundTime();
+          pList[counter].calculateWaitTime(pList[counter].getBurstTime());
+          avgWTTL += pList[counter].getWaitTime();
+        }
+      }
+        queue2.erase(queue2.begin());
+      }
+    }
+
+    if (queue1.size() == 0 && queue2.size() == 0 && queue3.size() != 0) {
+      int_process.push_back(queue3[0].getPID());
+
+      queue3[0].decrementBurstTime();
+      if (queue3[0].getBurstTime() == 0) {
+        for (int counter = 0; counter <= pList.size(); counter++) {
+        if (queue1[0].getPID() == pList[counter].getPID()) {
+          pList[counter].calculateTurnaroundTime((i + 1));
+          avgTTTL += pList[counter].getTurnaroundTime();
+          pList[counter].calculateWaitTime(pList[counter].getBurstTime());
+          avgWTTL += pList[counter].getWaitTime();
+        }
+      }
+        queue3.erase(queue3.begin());
+      }
+    }
+  }
+  avgTTTL/= pList.size();
+  avgWTTL/= pList.size();
+
+  int_process.pop_back();
+  ganttTimerTL = int_process;
+}
+
+void SJF(vector<Process> pList, double &avgTTSJF, double &avgWTSJF, vector<int> &ganttTimerSJF) {
+  for (int i = pList.size() - 1; i > 0; i--) {
+    for (int j = 0; j < i; j++) {
+      if (pList[j].getArriveTime() > pList[j + 1].getArriveTime()) {
+        Process temp_p = pList[j + 1];
+        pList[j + 1] = pList[j];
+        pList[j] = temp_p;
+      }
+    }
+  }
+  int sum_burstime = pList[0].getArriveTime();
+  vector<int> int_process;
+  vector<Process> p_schedule;
+  int i_time = pList[0].getArriveTime();
+  int pro_cess = (pList[0].getArriveTime() - 0);
+  for (int i = 0; i < pro_cess; i++) {
+    int_process.push_back(-1);
+  }
+
+
+  for (int x = 0; x < pList.size(); x++) {
+    sum_burstime = sum_burstime + pList[x].getBurstTime();
+  }
+  vector<Process> tem_p;
+
+  for (int y = pList[0].getArriveTime(); y < sum_burstime; y++) {
+    for (int z = 0; z < pList.size(); z++) {
+      if (pList[z].getArriveTime() == y) {
+        tem_p.push_back(pList[z]);
+        for (int i = tem_p.size() - 1; i > 0; i--) {
+          for (int j = 0; j < i; j++) {
+            if (tem_p[j].getBurstTime() > tem_p[j + 1].getBurstTime()) {
+              Process temp_p = tem_p[j + 1];
+              tem_p[j + 1] = tem_p[j];
+              tem_p[j] = temp_p;
+            }
+
+            if (tem_p[j].getBurstTime() == tem_p[j + 1].getBurstTime()) {
+              if (tem_p[j].getPriority() > tem_p[j + 1].getPriority()) {
+                Process temp_p = tem_p[j + 1];
+                tem_p[j + 1] = tem_p[j];
+                tem_p[j] = temp_p;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    int_process.push_back(tem_p[0].getPID());
+
+
+    tem_p[0].decrementBurstTime();
+
+    if (tem_p[0].getBurstTime() == 0) {
+      for (int counter = 0; counter <= pList.size(); counter++) {
+        if (tem_p[0].getPID() == pList[counter].getPID()) {
+          pList[counter].calculateTurnaroundTime((y + 1));
+          avgTTSJF += pList[counter].getTurnaroundTime();
+          pList[counter].calculateWaitTime(pList[counter].getBurstTime());
+          avgWTSJF += pList[counter].getWaitTime();
+        }
+      }
+      tem_p.erase(tem_p.begin());
+    }
+  }
+  avgTTSJF/= pList.size();
+  avgWTSJF/= pList.size();
+
+  ganttTimerSJF = int_process;
+
 }
